@@ -79,7 +79,7 @@ function newsletter_add_pdf_link( $content ) {
     if ( 'newsletter' == get_post_type() && get_field( 'pdf' ) ) {
         $PDF = get_field( 'pdf' );
 
-        $content = '<section class="newsletter-pdf dashicons-before dashicons-media-document">
+        $content = '<section class="download dashicons-before dashicons-media-document">
             <h2><a href="' . $PDF['url'] . '">Download the PDF version</a></h2>
             <p>' . $PDF['description'] . '</p>
         </section>' . $content;
