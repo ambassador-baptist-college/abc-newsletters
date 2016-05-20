@@ -90,7 +90,7 @@ add_filter( 'the_content', 'newsletter_add_pdf_link' );
 
 // Modify the page title
 function filter_newsletter_page_title( $title, $id = NULL ) {
-    if ( is_post_type_archive( 'faculty' ) ) {
+    if ( is_post_type_archive( 'newsletter' ) ) {
           $title = '&ldquo;The Ambassador&rdquo; Newsletter';
     }
 
