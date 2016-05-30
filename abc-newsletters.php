@@ -63,7 +63,7 @@ function newsletter_post_type() {
         'show_in_admin_bar'     => true,
         'show_in_nav_menus'     => true,
         'can_export'            => true,
-        'has_archive'           => 'news-events/the-ambassador-newsletter',
+        'has_archive'           => 'news-events/the-ambassador-newsletter/all',
         'exclude_from_search'   => false,
         'publicly_queryable'    => true,
         'rewrite'               => $rewrite,
@@ -97,3 +97,38 @@ function filter_newsletter_page_title( $title, $id = NULL ) {
     return $title;
 }
 add_filter( 'custom_title', 'filter_newsletter_page_title' );
+
+// Add shortcode for most recent newsletter
+function newsletter_shortcode() {
+// WP_Query arguments
+    $args = array (
+        'post_type'              => array( 'newsletter' ),
+        'post_status'            => array( 'publish' ),
+        'posts_per_page'         => '1',
+        'cache_results'          => true,
+        'update_post_meta_cache' => true,
+        'update_post_term_cache' => true,
+    );
+
+    // The Query
+    $next_newsletter_query = new WP_Query( $args );
+
+    $shortcode_content = '<h1>Last Newsletter</h1>
+        <p>See <a href="all/">past newsletters here</a>.</p>';
+
+    // The Loop
+    if ( $next_newsletter_query->have_posts() ) {
+        while ( $next_newsletter_query->have_posts() ) {
+            $next_newsletter_query->the_post();
+            ob_start();
+            require( 'template-parts/content-newsletter.php' );
+            $shortcode_content .= ob_get_clean();
+        }
+    }
+
+    // Restore original Post Data
+    wp_reset_postdata();
+
+    return $shortcode_content;
+}
+add_shortcode( 'last_newsletter', 'newsletter_shortcode' );
