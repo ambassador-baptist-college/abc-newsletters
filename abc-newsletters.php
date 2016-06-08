@@ -53,7 +53,7 @@ function newsletter_post_type() {
         'label'                 => 'Newsletter',
         'description'           => 'The Ambassador',
         'labels'                => $labels,
-        'supports'              => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'page-attributes', ),
+        'supports'              => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'page-attributes', 'author', ),
         'hierarchical'          => true,
         'public'                => true,
         'show_ui'               => true,
