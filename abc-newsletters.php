@@ -81,6 +81,7 @@ function newsletter_add_pdf_link( $content ) {
 
         $content = '<section class="download dashicons-before dashicons-media-document">
             <h2><a href="' . $PDF['url'] . '">Download the PDF version</a></h2>
+            <p class="filesize">Size: ' . size_format( filesize( get_attached_file( $PDF['id'] ) ) ) . '</p>
             <p>' . $PDF['description'] . '</p>
         </section>' . $content;
     }
@@ -114,7 +115,7 @@ function newsletter_shortcode() {
     $next_newsletter_query = new WP_Query( $args );
 
     $shortcode_content = '<h1>Last Newsletter</h1>
-        <p>See <a href="all/">past newsletters here</a>.</p>';
+        <p>See <a href="all/">previous newsletters here</a>.</p>';
 
     // The Loop
     if ( $next_newsletter_query->have_posts() ) {
