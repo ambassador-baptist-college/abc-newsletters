@@ -13,109 +13,41 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Register Custom Post Type
-function newsletter_post_type() {
-
-    $labels = array(
-        'name'                  => 'Newsletters',
-        'singular_name'         => 'Newsletter',
-        'menu_name'             => 'Newsletters',
-        'name_admin_bar'        => 'Newsletter',
-        'archives'              => 'Newsletter Archives',
-        'parent_item_colon'     => 'Parent Newsletter:',
-        'all_items'             => 'All Newsletters',
-        'add_new_item'          => 'Add New Newsletter',
-        'add_new'               => 'Add New',
-        'new_item'              => 'New Newsletter',
-        'edit_item'             => 'Edit Newsletter',
-        'update_item'           => 'Update Newsletter',
-        'view_item'             => 'View Newsletter',
-        'search_items'          => 'Search Newsletter',
-        'not_found'             => 'Not found',
-        'not_found_in_trash'    => 'Not found in Trash',
-        'featured_image'        => 'Featured Image',
-        'set_featured_image'    => 'Set featured image',
-        'remove_featured_image' => 'Remove featured image',
-        'use_featured_image'    => 'Use as featured image',
-        'insert_into_item'      => 'Insert into newsletter',
-        'uploaded_to_this_item' => 'Uploaded to this newsletter',
-        'items_list'            => 'Newsletters list',
-        'items_list_navigation' => 'Newsletters list navigation',
-        'filter_items_list'     => 'Filter newsletters list',
-    );
-    $rewrite = array(
-        'slug'                  => 'news-events/the-ambassador-newsletter',
-        'with_front'            => true,
-        'pages'                 => true,
-        'feeds'                 => true,
-    );
-    $args = array(
-        'label'                 => 'Newsletter',
-        'description'           => 'The Ambassador',
-        'labels'                => $labels,
-        'supports'              => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'page-attributes', 'author', ),
-        'hierarchical'          => true,
-        'public'                => true,
-        'show_ui'               => true,
-        'show_in_menu'          => true,
-        'menu_position'         => 20,
-        'menu_icon'             => 'dashicons-media-document',
-        'show_in_admin_bar'     => true,
-        'show_in_nav_menus'     => true,
-        'can_export'            => true,
-        'has_archive'           => 'news-events/the-ambassador-newsletter/all',
-        'exclude_from_search'   => false,
-        'publicly_queryable'    => true,
-        'rewrite'               => $rewrite,
-        'capability_type'       => 'page',
-    );
-    register_post_type( 'newsletter', $args );
-
-}
-add_action( 'init', 'newsletter_post_type', 0 );
-
 // Add PDF links
 function newsletter_add_pdf_link( $content ) {
-    if ( 'newsletter' == get_post_type() && get_field( 'pdf' ) ) {
-        $PDF = get_field( 'pdf' );
+    global $post;
 
-        $content = '<section class="download dashicons-before dashicons-media-document">
-            <h2><a href="' . $PDF['url'] . '">Download the PDF version</a></h2>
-            <p class="filesize">Size: ' . size_format( filesize( get_attached_file( $PDF['id'] ) ) ) . '</p>
-            <p>' . $PDF['description'] . '</p>
-        </section>' . $content;
+    foreach ( get_the_category( $post->ID ) as $category ) {
+        if ( 'newsletter' == $category->slug && get_field( 'pdf' ) ) {
+            $PDF = get_field( 'pdf' );
+
+            $content = '<section class="download dashicons-before dashicons-media-document">
+                <h2><a href="' . $PDF['url'] . '">Download the PDF version</a></h2>
+                <p class="filesize">Size: ' . size_format( filesize( get_attached_file( $PDF['id'] ) ) ) . '</p>
+                <p>' . $PDF['description'] . '</p>
+            </section>' . $content;
+        }
     }
+
     return $content;
 }
 add_filter( 'the_content', 'newsletter_add_pdf_link' );
-
-// Modify the page title
-function filter_newsletter_page_title( $title, $id = NULL ) {
-    if ( is_post_type_archive( 'newsletter' ) ) {
-          $title = '&ldquo;The Ambassador&rdquo; Newsletter';
-    }
-
-    return $title;
-}
-add_filter( 'custom_title', 'filter_newsletter_page_title' );
+add_filter( 'get_the_excerpt', 'newsletter_add_pdf_link' );
 
 // Add shortcode for most recent newsletter
 function newsletter_shortcode() {
 // WP_Query arguments
     $args = array (
-        'post_type'              => array( 'newsletter' ),
+        'category_name'          => array( 'newsletter' ),
         'post_status'            => array( 'publish' ),
         'posts_per_page'         => '1',
-        'cache_results'          => true,
-        'update_post_meta_cache' => true,
-        'update_post_term_cache' => true,
     );
 
     // The Query
     $next_newsletter_query = new WP_Query( $args );
 
     $shortcode_content = '<h1>Last Newsletter</h1>
-        <p>See <a href="all/">previous newsletters here</a>.</p>';
+        <p>See <a href="' . home_url( '/category/newsletter/' ) . '">previous newsletters here</a>.</p>';
 
     // The Loop
     if ( $next_newsletter_query->have_posts() ) {
