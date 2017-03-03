@@ -38,8 +38,7 @@ add_filter( 'get_the_excerpt', 'newsletter_add_pdf_link' );
 function newsletter_shortcode() {
 // WP_Query arguments
     $args = array (
-        'category_name'          => array( 'newsletter' ),
-        'post_status'            => array( 'publish' ),
+        'category_name'          => 'newsletter',
         'posts_per_page'         => '1',
     );
 
